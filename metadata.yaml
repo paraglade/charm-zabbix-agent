@@ -1,0 +1,12 @@
+name: zabbix-agent
+summary: "Zabbix Agent"
+maintainer: "Nelson Roberts <nelson.roberts@pearson.com>"
+subordinate: true
+description: |
+    Installs Zabbix Agent
+requires:
+  juju-info:
+    interface: juju-info
+    scope: container
+  monitoring:
+    interface: zabbix-server

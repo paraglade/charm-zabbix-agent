@@ -1,0 +1,11 @@
+#!/bin/bash -eux
+juju-log "running start hook"
+
+zabbix_server=`relation-get zabbix_server`
+
+if [ -z "${zabbix_server}" ] ; then
+  juju-log "zabbix server relation not setup skipping service start"
+  exit 0
+fi
+
+/usr/local/sbin/zabbix_agentd

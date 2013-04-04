@@ -1,0 +1,5 @@
+#!/bin/bash
+
+juju-log "starting juju-info-relation-joined"
+
+exit 0

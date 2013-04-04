@@ -1,0 +1,5 @@
+options:
+  zabbix-server:
+    type: string
+    default: zabbix.inteng.panpearsoncloud.com
+    description: zabbix server IP or hostname that the agent connects to

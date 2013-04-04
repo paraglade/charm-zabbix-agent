@@ -1,0 +1,35 @@
+#!/bin/bash
+set -eux # -x for verbose logging to juju debug-log
+
+juju-log "starting config-changed hook"
+
+hooksdir="$PWD/hooks"
+
+zabbix_server=$(config-get zabbix-server)
+
+if [ -z "${zabbix_server}" ] ; then
+  exit 0
+fi
+
+juju-log "setup zabbix config"
+
+zabbix_agentd_conf="/usr/local/etc/zabbix_agentd.conf"
+zabbix_agentd_conf="/usr/local/etc/zabbix_agent.conf"
+
+mkdir -p /var/log/zabbix
+mkdir -p /var/run/zabbix
+
+chown zabbix.zabbix /var/log/zabbix
+chown zabbix.zabbix /var/run/zabbix
+
+cp ${zabbix_agentd_conf} ${zabbix_agentd_conf}.$(date '+%s')
+cp ${zabbix_agent_conf} ${zabbix_agent_conf}.$(date '+%s')
+
+sed -i "s|*.PidFile=.*|PidFile=/var/run/zabbix/zabbix_agentd.pid|g" ${zabbix_agentd_conf}
+sed -i "s|*.LogFile=.*|LogFile=/var/log/zabbix/zabbix_agentd.log|g" ${zabbix_agentd_conf}
+sed -i "s|*.EnableRemoteCommands=.*|EnableRemoteCommands=1|g" ${zabbix_agentd_conf}
+sed -i "s|.*Server=.*|Server=${zabbix_server}|g" ${zabbix_agentd_conf}
+sed -i "s|.*ServerActive=.*|ServerActive=${zabbix_server}|g" ${zabbix_agentd_conf}
+
+juju-log "restart services"
+${hooksdir}/restart

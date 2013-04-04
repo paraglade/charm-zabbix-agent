@@ -1,0 +1,6 @@
+#!/bin/bash -x
+juju-log "running stop hook"
+
+pkill -9 zabbix_agentd
+
+exit 0
