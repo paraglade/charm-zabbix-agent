@@ -5,31 +5,42 @@ juju-log "starting config-changed hook"
 
 hooksdir="$PWD/hooks"
 
-zabbix_server=$(config-get zabbix-server)
+zabbix_server=$(relation-get private-address)
+zabbix_server_active=$(relation-get private-address)
 
 if [ -z "${zabbix_server}" ] ; then
-  exit 0
+  zabbix_server=$(config-get Server)
+  zabbix_server_active=$(config-get ServerActive)
 fi
 
-juju-log "setup zabbix config"
+#juju-log "setup zabbix config"
 
 zabbix_agentd_conf="/usr/local/etc/zabbix_agentd.conf"
-zabbix_agentd_conf="/usr/local/etc/zabbix_agent.conf"
+zabbix_agent_conf="/usr/local/etc/zabbix_agent.conf"
 
-mkdir -p /var/log/zabbix
-mkdir -p /var/run/zabbix
+pidfile=$(config-get PidFile)
+pidfile_dir=$(dirname ${pidfile})
+logfile=$(config-get LogFile)
+logfile_dir=$(dirname ${logfile})
 
-chown zabbix.zabbix /var/log/zabbix
-chown zabbix.zabbix /var/run/zabbix
+mkdir -p ${pidfile_dir}
+mkdir -p ${logfile_dir}
+
+chown zabbix.zabbix ${pidfile_dir}
+chown zabbix.zabbix ${logfile_dir}
 
 cp ${zabbix_agentd_conf} ${zabbix_agentd_conf}.$(date '+%s')
 cp ${zabbix_agent_conf} ${zabbix_agent_conf}.$(date '+%s')
 
-sed -i "s|*.PidFile=.*|PidFile=/var/run/zabbix/zabbix_agentd.pid|g" ${zabbix_agentd_conf}
-sed -i "s|*.LogFile=.*|LogFile=/var/log/zabbix/zabbix_agentd.log|g" ${zabbix_agentd_conf}
-sed -i "s|*.EnableRemoteCommands=.*|EnableRemoteCommands=1|g" ${zabbix_agentd_conf}
-sed -i "s|.*Server=.*|Server=${zabbix_server}|g" ${zabbix_agentd_conf}
-sed -i "s|.*ServerActive=.*|ServerActive=${zabbix_server}|g" ${zabbix_agentd_conf}
+sed -i "s|.*PidFile=.*|PidFile=${pidfile}|g" ${zabbix_agentd_conf}
+sed -i "s|^LogFile=.*|LogFile=${logfile}|g" ${zabbix_agentd_conf}
+sed -i "s|.*EnableRemoteCommands=.*|EnableRemoteCommands=$(config-get EnableRemoteCommands)|g" ${zabbix_agentd_conf}
+sed -i "s|^Server=.*|Server=${zabbix_server}|g" ${zabbix_agentd_conf}
+sed -i "s|^ServerActive=.*|ServerActive=${zabbix_server_active}|g" ${zabbix_agentd_conf}
+sed -i "s|^Hostname=.*|Hostname=$(hostname)|g" ${zabbix_agentd_conf}
+
+sed -i "s|Server=.*|Server=$(config-get Server)|g" ${zabbix_agent_conf}
+
 
 juju-log "restart services"
 ${hooksdir}/restart

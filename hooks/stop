@@ -1,6 +1,9 @@
 #!/bin/bash -x
 juju-log "running stop hook"
 
+open-port 10050/tcp
+open-port 10050/udp
+
 pkill -9 zabbix_agentd
 
 exit 0

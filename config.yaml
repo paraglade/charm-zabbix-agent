@@ -1,5 +1,41 @@
 options:
-  zabbix-server:
+  Server:
     type: string
-    default: zabbix.inteng.panpearsoncloud.com
-    description: zabbix server IP or hostname that the agent connects to
+    default: localhost
+    description: "List of comma delimited IP addresses (or hostnames) of Zabbix servers.
+      Incoming connections will be accepted only from the hosts listed here.
+      No spaces allowed.
+      If IPv6 support is enabled then '127.0.0.1', '::127.0.0.1', '::ffff:127.0.0.1' are treated equally.
+
+      Mandatory: no"
+  ServerActive:
+    type: string
+    default: localhost
+    description: "List of comma delimited IP:port (or hostname:port) pairs of Zabbix servers for active checks.
+      If port is not specified, default port is used.
+      IPv6 addresses must be enclosed in square brackets if port for that host is specified.
+      If port is not specified, square brackets for IPv6 addresses are optional.
+      If this parameter is not specified, active checks are disabled.
+      Example: ServerActive=127.0.0.1:20051,zabbix.domain,[::1]:30051,::1,[12fc::1]
+
+      Mandatory: no"
+  PidFile:
+    type: string
+    default: /var/run/zabbix/zabbix_agentd.pid
+    description: "Name of the PID file.
+    
+      Mandatory: no"
+  LogFile:
+    type: string
+    default: /var/log/zabbix/zabbix_agentd.log
+    description: "Name of log file. If not set, syslog is used.
+
+      Mandatory: no"
+  EnableRemoteCommands:
+    type: int
+    default: 1
+    description: "Whether remote commands from Zabbix server are allowed.
+      0 - not allowed
+      1 - allowed
+
+      Mandatory: no"
