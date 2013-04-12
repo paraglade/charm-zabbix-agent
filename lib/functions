@@ -11,10 +11,10 @@ update_config() {
     zabbix_server=$(cat config/Server)
   fi
 
-  if [ -f "config/ServerActive" ] ; then
-    juju-log "using relation value for ServerActive"
-    zabbix_server_active=$(cat config/Server)
-  fi
+#  if [ -f "config/ServerActive" ] ; then
+#    juju-log "using relation value for ServerActive"
+#    zabbix_server_active=$(cat config/Server)
+#  fi
 
   zabbix_agentd_conf="/usr/local/etc/zabbix_agentd.conf"
   zabbix_agent_conf="/usr/local/etc/zabbix_agent.conf"
