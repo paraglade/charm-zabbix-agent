@@ -1,7 +1,8 @@
 #!/bin/bash -eux
 juju-log "running start hook"
 
+/usr/local/sbin/zabbix_agentd
+
 open-port 10050/tcp
 open-port 10050/udp
 
-/usr/local/sbin/zabbix_agentd

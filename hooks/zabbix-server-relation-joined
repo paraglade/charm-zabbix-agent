@@ -1,0 +1,9 @@
+#!/bin/bash
+set -eux # -x for verbose logging to juju debug-log
+
+juju-log "starting hook zabbix-relation-joined"
+
+echo "$(relation-get private-address)" > config/Server
+echo "$(relation-get private-address)" > config/ServerActive
+
+hooks/config-changed

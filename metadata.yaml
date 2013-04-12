@@ -8,5 +8,7 @@ requires:
   juju-info:
     interface: juju-info
     scope: container
-  monitoring:
-    interface: zabbix-server
+  zabbix-server:
+    interface: server
+  zabbix-proxy:
+    interface: proxy

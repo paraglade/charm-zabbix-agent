@@ -1,0 +1,46 @@
+#!/bin/bash
+
+update_config() {
+  juju-log "starting update configuration"
+
+  zabbix_server=$(config-get Server)
+  zabbix_server_active=$(config-get ServerActive)
+
+  if [ -f "config/Server" ] ; then
+    juju-log "using relation value for Server"
+    zabbix_server=$(cat config/Server)
+  fi
+
+  if [ -f "config/ServerActive" ] ; then
+    juju-log "using relation value for ServerActive"
+    zabbix_server_active=$(cat config/Server)
+  fi
+
+  zabbix_agentd_conf="/usr/local/etc/zabbix_agentd.conf"
+  zabbix_agent_conf="/usr/local/etc/zabbix_agent.conf"
+
+  pidfile=$(config-get PidFile)
+  pidfile_dir=$(dirname ${pidfile})
+  logfile=$(config-get LogFile)
+  logfile_dir=$(dirname ${logfile})
+
+  mkdir -p ${pidfile_dir}
+  mkdir -p ${logfile_dir}
+
+  chown zabbix.zabbix ${pidfile_dir}
+  chown zabbix.zabbix ${logfile_dir}
+
+  cp ${zabbix_agentd_conf} ${zabbix_agentd_conf}.$(date '+%s')
+  cp ${zabbix_agent_conf} ${zabbix_agent_conf}.$(date '+%s')
+
+  sed -i "s|.*PidFile=.*|PidFile=${pidfile}|g" ${zabbix_agentd_conf}
+  sed -i "s|^LogFile=.*|LogFile=${logfile}|g" ${zabbix_agentd_conf}
+  sed -i "s|.*EnableRemoteCommands=.*|EnableRemoteCommands=$(config-get EnableRemoteCommands)|g" ${zabbix_agentd_conf}
+  sed -i "s|^Server=.*|Server=${zabbix_server}|g" ${zabbix_agentd_conf}
+  sed -i "s|^ServerActive=.*|ServerActive=${zabbix_server_active}|g" ${zabbix_agentd_conf}
+  sed -i "s|^Hostname=.*|Hostname=$(hostname)|g" ${zabbix_agentd_conf}
+
+  sed -i "s|Server=.*|Server=${zabbix_server}|g" ${zabbix_agent_conf}
+  
+  juju-log "finished update configuration"
+}
